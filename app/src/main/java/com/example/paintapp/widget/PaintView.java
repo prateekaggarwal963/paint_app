@@ -17,7 +17,7 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 
 public class PaintView extends View {
-    private Bitmap bitBackground,btmView;
+    private Bitmap bitBackground,btmView,image;
     private Paint mPaint = new Paint();
     private Path mPath= new Path();
     private int colorBackground,sizeBrush,sizeEraser;
@@ -25,6 +25,7 @@ public class PaintView extends View {
     private Canvas mCanvas;
     private final int DEDDERENCE_SPACE=4;
     private ArrayList<Bitmap> listAction = new ArrayList<>();
+    private int leftImage=50,topImage=50;
 
     public PaintView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -61,6 +62,10 @@ public class PaintView extends View {
         canvas.drawColor(colorBackground);
         canvas.drawBitmap(bitBackground,0,0,null);
         canvas.drawBitmap(btmView,0,0,null);
+        if(image!=null)
+        {
+            canvas.drawBitmap(image,leftImage,topImage,null);
+        }
     }
 
     public void setColorBackground(int color) {
@@ -159,5 +164,10 @@ public class PaintView extends View {
         Bitmap bitmap = Bitmap.createBitmap(this.getDrawingCache());
         this.setDrawingCacheEnabled(false);
         return bitmap;
+    }
+
+    public void setImage(Bitmap bitmap) {
+        image=Bitmap.createScaledBitmap(bitmap,getWidth()/2,getHeight()/2,true);
+        invalidate();
     }
 }

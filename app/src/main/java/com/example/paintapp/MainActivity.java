@@ -2,6 +2,7 @@ package com.example.paintapp;
 
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -12,10 +13,14 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -35,12 +40,14 @@ import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements ToolsListener {
 
+    private static final int PICK_IMAGE = 1000;
     PaintView mPaintView;
     int colorBackground, colorBrush;
     int brushSize, eraserSize;
@@ -70,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements ToolsListener {
         List<ToolsItem> result = new ArrayList<>();
         result.add(new ToolsItem(R.drawable.baseline_brush_24, Common.BRUSH));
         result.add(new ToolsItem(R.drawable.eraser, Common.ERASER));
+        result.add(new ToolsItem(R.drawable.baseline_image_24,Common.IMAGE));
         result.add(new ToolsItem(R.drawable.baseline_palette_24, Common.COLORS));
         result.add(new ToolsItem(R.drawable.paint_bucket, Common.BACKGROUND));
         result.add(new ToolsItem(R.drawable.baseline_undo_24, Common.RETURN));
@@ -151,8 +159,72 @@ public class MainActivity extends AppCompatActivity implements ToolsListener {
             case Common.COLORS:
                 updateColor(name);
                 break;
+            case Common.IMAGE:
+                getImage();
+                break;
         }
     }
+
+    private void getImage() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        startActivityForResult(Intent.createChooser(intent,"Select picture"),PICK_IMAGE);
+    }
+
+//    private void selectImage(){
+//        Intent i = new Intent();
+//        i.setType("image/*");
+//        i.setAction(Intent.ACTION_GET_CONTENT);
+//        startActivityForResult(i,100);
+//
+//    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==PICK_IMAGE && data!=null && data.getData()!=null)
+        {
+            // data.getData();    geting uri
+            Bitmap bitmap = null;
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), data.getData());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            Uri pickedImage = data.getData();
+            String[] filePath = {MediaStore.Images.Media.DATA};
+            Cursor cursor = getContentResolver().query(pickedImage,filePath,null,null,null);
+            cursor.moveToFirst();
+            String k = filePath[0];
+            Toast.makeText(this, pickedImage.toString(), Toast.LENGTH_SHORT).show();
+            String imagePath = cursor.getString(cursor.getColumnIndex(k));
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            Bitmap bitmap1 = BitmapFactory.decodeFile(imagePath, options);
+            mPaintView.setImage(bitmap1);
+            cursor.close();
+        }
+    }
+    //@Override
+//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//        if(requestCode == PICK_IMAGE && data!=null && resultCode==RESULT_OK)
+//        {
+//            Uri pickedImage = data.getData();
+//            String[] filePath = {MediaStore.Images.Media.DATA};
+//            Cursor cursor = getContentResolver().query(pickedImage,filePath,null,null,null);
+//            cursor.moveToFirst();
+//            String k = pickedImage.toString();
+//            Toast.makeText(this, k, Toast.LENGTH_SHORT).show();
+//            String imagePath = cursor.getString(cursor.getColumnIndex(k.toString()));
+//            BitmapFactory.Options options = new BitmapFactory.Options();
+//            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+//            Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+//            mPaintView.setImage(bitmap);
+//            cursor.close();
+//
+//        }
+//        super.onActivityResult(requestCode, resultCode, data);
+//    }
 
     private void updateColor(String name) {
         int color;

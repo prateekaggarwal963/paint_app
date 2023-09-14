@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -82,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements ToolsListener {
     }
 
     public void showFiles(View view) {
+        startActivity(new Intent(this,ListFilesAct.class));
     }
 
     public void saveFile(View view) {

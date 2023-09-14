@@ -72,7 +72,7 @@ public class PaintView extends View {
         this.sizeBrush = sizeBrush;
         mPaint.setStrokeWidth(toPx(this.sizeBrush));
     }
-    public void setBrudhColor(int color){
+    public void setBrushColor(int color){
         mPaint.setColor(color);
     }
     public void setSizeEraser(int s)
@@ -89,7 +89,7 @@ public class PaintView extends View {
         mPaint.setShader(null);
         mPaint.setMaskFilter(null);
     }
-    public void addLastAction(Bitmap bitmap)
+    public void                     addLastAction(Bitmap bitmap)
     {
         listAction.add(bitmap);
     }
@@ -124,6 +124,7 @@ public class PaintView extends View {
                 break;
             case MotionEvent.ACTION_UP:
                 touchUp();
+                addLastAction(getBitmap());
                 break;
         }
         return true;

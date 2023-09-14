@@ -1,6 +1,7 @@
 package com.example.paintapp.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +10,9 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.paintapp.Interface.ViewOnClick;
 import com.example.paintapp.R;
+import com.example.paintapp.ViewFileAct;
 import com.example.paintapp.viewHolder.FileViewHolder;
 
 import java.io.File;
@@ -35,6 +38,14 @@ public class FilesAdapters extends RecyclerView.Adapter<FileViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull FileViewHolder holder, int position) {
 holder.imageView.setImageURI(Uri.fromFile(fileList.get(position)));
+holder.setViewOnClick(new ViewOnClick() {
+    @Override
+    public void onClick(int pos) {
+        Intent i = new Intent(mContext, ViewFileAct.class);
+        i.setData(Uri.fromFile(fileList.get(pos)));
+        mContext.startActivity(i);
+    }
+});
     }
 
     @Override

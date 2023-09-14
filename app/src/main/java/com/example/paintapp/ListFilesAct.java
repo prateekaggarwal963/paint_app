@@ -13,12 +13,15 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.paintapp.adapters.FilesAdapters;
+import com.example.paintapp.common.Common;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ListFilesAct extends AppCompatActivity {
+
+    List<File> fileList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +36,8 @@ public class ListFilesAct extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
         recyclerView.setLayoutManager(gridLayoutManager);
-        FilesAdapters filesAdapters = new FilesAdapters(this, loadFile());
+        fileList = loadFile();
+        FilesAdapters filesAdapters = new FilesAdapters(this, fileList);
         recyclerView.setAdapter(filesAdapters);
     }
 
@@ -47,10 +51,12 @@ public class ListFilesAct extends AppCompatActivity {
             }
 
         }
-        if(files.length>0)
-        {
-            TextView textView = findViewById(R.id.status_empty);
+        TextView textView = findViewById(R.id.status_empty);
+
+        if (files.length > 0) {
             textView.setVisibility(View.GONE);
+        }else {
+            textView.setVisibility(View.VISIBLE);
         }
         return inFiles;
     }
@@ -68,5 +74,19 @@ public class ListFilesAct extends AppCompatActivity {
         if (id == android.R.id.home)
             finish();
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        if (item.getTitle().equals(Common.DELETE)) {
+            deleteFile(item.getOrder());
+            initViews();
+        }
+        return true;
+    }
+
+    private void deleteFile(int order) {
+        fileList.get(order).delete();
+        fileList.remove(order);
     }
 }

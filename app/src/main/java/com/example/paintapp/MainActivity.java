@@ -80,6 +80,12 @@ public class MainActivity extends AppCompatActivity implements ToolsListener {
     }
 
     public void shareApp(View view) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        String bodyText="http://play.google.com/store/apps/details?id="+getPackageName();
+        intent.putExtra(Intent.EXTRA_SUBJECT,getString(R.string.app_name));
+        intent.putExtra(Intent.EXTRA_TEXT,bodyText);
+        startActivity(Intent.createChooser(intent,"share this app"));
     }
 
     public void showFiles(View view) {

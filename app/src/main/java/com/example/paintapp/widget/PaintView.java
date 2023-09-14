@@ -26,6 +26,8 @@ public class PaintView extends View {
     private final int DEDDERENCE_SPACE=4;
     private ArrayList<Bitmap> listAction = new ArrayList<>();
     private int leftImage=50,topImage=50;
+    private boolean toMove = false;
+    private float refX,refY;
 
     public PaintView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -122,9 +124,34 @@ public class PaintView extends View {
         {
             case MotionEvent.ACTION_DOWN:
                 touchStart(x,y);
+                refY=y;
+                refX=x;
+                if (image!=null)
+                {
+                    if((refX>=leftImage && refY<=image.getWidth()+leftImage)
+                        && (refY >=topImage && refY<=topImage+image.getHeight()))
+                    {
+                        toMove = true;
+                    }else {
+                        toMove=false;
+                    }
+                }
                 break;
 
             case MotionEvent.ACTION_MOVE:
+                if(!toMove)
+                {
+                    touchMove(x,y);
+                }else {
+                    float nX = event.getX();
+                    float nY=event.getY();
+
+                    leftImage+=nX-refX;
+                    topImage+=nY-refY;
+                    refX=nX;
+                    refY=nY;
+                    invalidate();
+                }
                 touchMove(x,y);
                 break;
             case MotionEvent.ACTION_UP:

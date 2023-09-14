@@ -191,18 +191,18 @@ public class MainActivity extends AppCompatActivity implements ToolsListener {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            Uri pickedImage = data.getData();
-            String[] filePath = {MediaStore.Images.Media.DATA};
-            Cursor cursor = getContentResolver().query(pickedImage,filePath,null,null,null);
-            cursor.moveToFirst();
-            String k = filePath[0];
-            Toast.makeText(this, pickedImage.toString(), Toast.LENGTH_SHORT).show();
-            String imagePath = cursor.getString(cursor.getColumnIndex(k));
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-            Bitmap bitmap1 = BitmapFactory.decodeFile(imagePath, options);
-            mPaintView.setImage(bitmap1);
-            cursor.close();
+//            Uri pickedImage = data.getData();
+//            String[] filePath = {MediaStore.Images.Media.DATA};
+//            Cursor cursor = getContentResolver().query(pickedImage,filePath,null,null,null);
+//            cursor.moveToFirst();
+//            String k = filePath[0];
+//            Toast.makeText(this, pickedImage.toString(), Toast.LENGTH_SHORT).show();
+//            String imagePath = cursor.getString(cursor.getColumnIndex(k));
+//            BitmapFactory.Options options = new BitmapFactory.Options();
+//            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+//            Bitmap bitmap1 = BitmapFactory.decodeFile(imagePath, options);
+            mPaintView.setImage(bitmap);
+        //    cursor.close();
         }
     }
     //@Override

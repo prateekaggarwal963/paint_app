@@ -1,18 +1,26 @@
 package com.example.paintapp;
 
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.paintapp.Interface.ToolsListener;
 import com.example.paintapp.adapters.ToolsAdapter;
@@ -23,14 +31,19 @@ import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements ToolsListener {
 
     PaintView mPaintView;
     int colorBackground, colorBrush;
     int brushSize, eraserSize;
+    private static final int REQUEST_PERMISSION =1001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +85,42 @@ public class MainActivity extends AppCompatActivity implements ToolsListener {
     }
 
     public void saveFile(View view) {
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED)
+        {
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},REQUEST_PERMISSION);
+        }else {
+            saveBitmap();
+        }
+
+    }
+
+    private void saveBitmap() {
+        Bitmap bitmap = mPaintView.getBitmap();
+        String file_name = UUID.randomUUID()+".png";
+        File folder = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+getString(R.string.app_name));
+        if(!folder.exists())
+        {
+            folder.mkdir();
+        }
+        FileOutputStream fileOutputStream = null;
+        try {
+            fileOutputStream = new FileOutputStream(folder+ File.separator+file_name);
+            bitmap.compress(Bitmap.CompressFormat.PNG,100,fileOutputStream);
+            Toast.makeText(this, "picture saved", Toast.LENGTH_SHORT).show();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(requestCode==REQUEST_PERMISSION && grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+        {
+            saveBitmap();
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     @Override
